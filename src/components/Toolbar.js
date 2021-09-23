@@ -1,5 +1,5 @@
-import React from 'react'
+import React from 'react';
 function Toolbar(props) {
-  return <div>Toolbar {props.name}</div>
+  return <div>Toolbar {props.name}</div>;
 }
-export default Toolbar
+export default Toolbar;
