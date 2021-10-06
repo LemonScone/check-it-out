@@ -1,4 +1,4 @@
-import Toolbar from './components/Toolbar'
+import Toolbar from './components/Toolbar';
 
 function App() {
   return (
@@ -6,7 +6,7 @@ function App() {
       <header className="App-header"></header>
       <Toolbar name="check-it-out"></Toolbar>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
