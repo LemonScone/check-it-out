@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 app.whenReady().then(() => {
@@ -7,9 +7,10 @@ app.whenReady().then(() => {
     webPreferences: {
       enableRemoteModule: true,
       preload: `${__dirname}/preload.js`,
+      nodeIntegration: true,
+      contextIsolation: false,
     },
   });
-  console.log(process.env);
   if (process.env.mode === 'dev') {
     win.loadURL('http://localhost:3000');
     win.webContents.openDevTools();
@@ -17,6 +18,13 @@ app.whenReady().then(() => {
     // win.loadURL(`file://${path.join(__dirname, '../build/index.html')}`)
     win.loadFile(`${path.join(__dirname, '../build/index.html')}`);
   }
+
+  ipcMain.on('ACTIVE_WINDOW', async (event, payload) => {
+    const activeWindow = require('active-win');
+    const active = await activeWindow({ screenRecordingPermission: true });
+    console.log('ipcMain on : ', active);
+    event.reply('REPLY_ACTIVE_WINDOW', active);
+  });
 
   win.once('ready-to-show', () => win.show());
   win.on('closed', () => {
