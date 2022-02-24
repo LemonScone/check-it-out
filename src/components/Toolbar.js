@@ -81,6 +81,11 @@ const DisplayTracking = (props) => {
   );
 };
 
+const electron = window.require('electron');
+electron.ipcRenderer.on('REPLY_ACTIVE_WINDOW', (event, payload) => {
+  console.log('payload : ', payload);
+});
+
 class Toolbar extends React.Component {
   constructor(props) {
     super(props);
@@ -96,6 +101,15 @@ class Toolbar extends React.Component {
     // this.trackTimeClickHandler = this.trackTimeClickHandler.bind(this);
     // this.addTime = this.addTime.bind(this);
   }
+
+  componentDidMount = () => {
+    console.log('ipcRender start');
+    setInterval(this.electronActiveWin, 2000);
+  };
+
+  electronActiveWin = () => {
+    electron.ipcRenderer.send('ACTIVE_WINDOW', '');
+  };
 
   /// TrackTime 컴포넌트의 클릭 이벤트로 넘겨줄 메서드입니다.
   trackTimeClickHandler = () => {
