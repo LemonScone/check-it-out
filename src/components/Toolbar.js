@@ -81,6 +81,11 @@ const DisplayTracking = (props) => {
   );
 };
 
+const electron = window.require('electron');
+electron.ipcRenderer.on('REPLY_ACTIVE_WINDOW', (event, payload) => {
+  console.log('payload : ', payload);
+});
+
 class Toolbar extends React.Component {
   constructor(props) {
     super(props);
@@ -91,7 +96,6 @@ class Toolbar extends React.Component {
       workingTime: 0,
       isAction: false,
       interval: null,
-      intervalForActiveWin: null,
       stayDay: new Date(),
     };
     // this.trackTimeClickHandler = this.trackTimeClickHandler.bind(this);
@@ -100,15 +104,11 @@ class Toolbar extends React.Component {
 
   componentDidMount = () => {
     console.log('ipcRender start');
-    this.setState({ intervalForActiveWin: setInterval(this.electronActiveWin, 2000) });
+    setInterval(this.electronActiveWin, 2000);
   };
 
   electronActiveWin = () => {
-    const electron = window.require('electron');
     electron.ipcRenderer.send('ACTIVE_WINDOW', '');
-    electron.ipcRenderer.on('REPLY_ACTIVE_WINDOW', (event, payload) => {
-      console.log('payload : ', payload);
-    });
   };
 
   /// TrackTime 컴포넌트의 클릭 이벤트로 넘겨줄 메서드입니다.
