@@ -16,7 +16,7 @@
     "react-scripts": "^4.0.3"
   },
   "scripts": {
-    "start": "concurrently \"npm run react:start\" \"npm run electron:start\"",
+    "start": "concurrently BROWSER=none \"npm run react:start\" \"npm run electron:start\"",
     "react:start": "react-scripts start",
     "electron:start": "wait-on http://localhost:3000 && mode=dev electron .",
     "build": "react-scripts build",

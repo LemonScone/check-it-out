@@ -7,8 +7,8 @@ app.whenReady().then(() => {
     webPreferences: {
       enableRemoteModule: true,
       preload: `${__dirname}/preload.js`,
-      nodeIntegration: true,
-      contextIsolation: false,
+      // nodeIntegration: true,
+      // contextIsolation: false,
     },
   });
   if (process.env.mode === 'dev') {
