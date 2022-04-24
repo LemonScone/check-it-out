@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 
 app.whenReady().then(() => {
   let win = new BrowserWindow({
@@ -30,6 +31,11 @@ app.whenReady().then(() => {
   win.on('closed', () => {
     win = null;
   });
+
+  //react developer tools extension 추가
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err));
 });
 
 app.on('window-all-closed', () => {

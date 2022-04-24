@@ -16,7 +16,7 @@
     "react-scripts": "^4.0.3"
   },
   "scripts": {
-    "start": "concurrently BROWSER=none \"npm run react:start\" \"npm run electron:start\"",
+    "start": "concurrently \"npm run react:start\" \"npm run electron:start\"",
     "react:start": "react-scripts start",
     "electron:start": "wait-on http://localhost:3000 && mode=dev electron .",
     "build": "react-scripts build",
@@ -38,6 +38,7 @@
   "devDependencies": {
     "concurrently": "^6.2.1",
     "electron": "^14.0.0",
+    "electron-devtools-installer": "^3.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.3.2",
