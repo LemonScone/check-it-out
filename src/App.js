@@ -6,7 +6,8 @@ const {
 } = window;
 
 onIpc('REPLY_ACTIVE_WINDOW', (event, payload) => {
-  console.log(payload);
+  console.log(payload.window);
+  console.table(payload.activeWindows);
 });
 
 function App() {
