@@ -1,6 +1,10 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
+const formatDistanceStrict = require('date-fns/formatDistanceStrict');
+
+const activeWindows = [];
+let currentActiveWin;
 
 app.whenReady().then(() => {
   let win = new BrowserWindow({
@@ -8,8 +12,6 @@ app.whenReady().then(() => {
     webPreferences: {
       enableRemoteModule: true,
       preload: `${__dirname}/preload.js`,
-      // nodeIntegration: true,
-      // contextIsolation: false,
     },
   });
   if (process.env.mode === 'dev') {
@@ -21,10 +23,39 @@ app.whenReady().then(() => {
   }
 
   ipcMain.on('ACTIVE_WINDOW', async (event, payload) => {
-    const activeWindow = require('active-win');
-    const active = await activeWindow({ screenRecordingPermission: true });
-    console.log('ipcMain on : ', active);
-    event.reply('REPLY_ACTIVE_WINDOW', active);
+    const activeWin = require('active-win');
+    let window = await activeWin({ screenRecordingPermission: true });
+
+    //* 데이터 가공
+    const processedWindow = {
+      id: window.id,
+      title: window.title,
+      processId: window.owner.processId,
+      name: window.owner.name,
+      url: window.url,
+      startDate: new Date(),
+    };
+
+    //* 첫 할당이거나 활성 프로그램이 변했으면 재할당
+    //TODO 아무 프로그램도 활성화되어 있지 않을 때 (=바탕화면에 포커스가 잡혀있는 경우)
+    if (!currentActiveWin || currentActiveWin.id !== processedWindow.id) {
+      //* 날짜 객체 생성해서 차이 구하기
+      const startedDate = currentActiveWin ? currentActiveWin.startDate : processedWindow.startDate;
+      const finishedDate = processedWindow.startDate;
+
+      const distance = formatDistanceStrict(startedDate, finishedDate, {
+        unit: 'second',
+      });
+
+      if (currentActiveWin) {
+        [currentActiveWin.finishedDate, currentActiveWin.distance] = [finishedDate, distance];
+      }
+
+      currentActiveWin = processedWindow;
+      activeWindows.push(processedWindow);
+    }
+
+    event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
   });
 
   win.once('ready-to-show', () => win.show());
