@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, ButtonGroup, Card, Divider } from '@mui/material';
 import MuiGrid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import { PlayArrow, Pause, ArrowForwardIos } from '@mui/icons-material';
 import { ArrowBackIosNew } from '@mui/icons-material';
+import { useInterval } from '../hooks/intervalHooks.js';
 
 const Grid = styled(MuiGrid)(({ theme }) => ({
   width: '100%',
@@ -100,46 +101,17 @@ function Toolbar() {
     };
   });
 
-  // TODO useState로 setInterval 안됨...
-  //setIntervalForTimer(setInterval(addTime, 1000));
-  useInterval(() => {
-    if (isOnTracked) setIntervalForTimer(addTime());
-  }, 1000);
-
-  function useInterval(callback, delay) {
-    const savedCallback = useRef();
-
-    // Remember the latest callback.
-    useEffect(() => {
-      savedCallback.current = callback;
-    }, [callback]);
-
-    // Set up the interval.
-    useEffect(() => {
-      function tick() {
-        savedCallback.current();
-      }
-      if (delay !== null) {
-        let id = setInterval(tick, delay);
-        return () => clearInterval(id);
-      }
-    }, [delay]);
-  }
+  useInterval(
+    () => {
+      setIntervalForTimer(addTime());
+    },
+    isOnTracked ? 1000 : null,
+  );
 
   function handleTrackButtonClick() {
     setStart(isOnTracked ? start : new Date().toLocaleString());
     setFinish(isOnTracked ? new Date().toLocaleString() : '작업중');
     setIsOnTracked(!isOnTracked);
-
-    // if (!isOnTracked) {
-    //   // TODO useState로 setInterval 안됨...
-    //   //setIntervalForTimer(setInterval(addTime, 1000));
-    //   useInterval(() => {
-    //     setIntervalForTimer(addTime());
-    //   }, 1000);
-    // } else {
-    //   clearInterval(intervalForTimer);
-    // }
   }
 
   function handleLeftArrowButtonClick() {
