@@ -27,27 +27,35 @@ app.whenReady().then(() => {
     let window = await activeWin({ screenRecordingPermission: true });
 
     //* 데이터 가공
-    window = { ...window, startDate: new Date() };
+    const processedWindow = {
+      id: window.id,
+      title: window.title,
+      processId: window.owner.processId,
+      name: window.owner.name,
+      url: window.url,
+      startDate: new Date(),
+    };
 
     //* 첫 할당이거나 활성 프로그램이 변했으면 재할당
     //TODO 아무 프로그램도 활성화되어 있지 않을 때 (=바탕화면에 포커스가 잡혀있는 경우)
-    if (!currentActiveWin || currentActiveWin.id !== window.id) {
+    if (!currentActiveWin || currentActiveWin.id !== processedWindow.id) {
       //* 날짜 객체 생성해서 차이 구하기
-      const startedDate = currentActiveWin ? currentActiveWin.startDate : window.startDate;
-      const finishedDate = window.startDate;
+      const startedDate = currentActiveWin ? currentActiveWin.startDate : processedWindow.startDate;
+      const finishedDate = processedWindow.startDate;
 
       const distance = formatDistanceStrict(startedDate, finishedDate, {
         unit: 'second',
       });
 
       if (currentActiveWin) {
-        currentActiveWin = { ...currentActiveWin, distance, finishedDate };
+        [currentActiveWin.finishedDate, currentActiveWin.distance] = [finishedDate, distance];
       }
-      currentActiveWin = window;
-      activeWindows.push(window);
+
+      currentActiveWin = processedWindow;
+      activeWindows.push(processedWindow);
     }
 
-    event.reply('REPLY_ACTIVE_WINDOW', { window, activeWindows });
+    event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
   });
 
   win.once('ready-to-show', () => win.show());
