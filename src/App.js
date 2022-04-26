@@ -14,11 +14,10 @@ function App() {
       console.log(payload.processedWindow);
       console.table(payload.activeWindows);
       setActiveWindows(payload.activeWindows);
-
-      return () => {
-        removeIpc('REPLY_ACTIVE_WINDOW');
-      };
     });
+    return () => {
+      removeIpc('REPLY_ACTIVE_WINDOW');
+    };
   }, [activeWindows]);
 
   useInterval(() => {
