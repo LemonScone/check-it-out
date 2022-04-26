@@ -9,4 +9,7 @@ contextBridge.exposeInMainWorld('electronBridge', {
     //* main process의 회신 처리
     ipcRenderer.on(key, fn);
   },
+  removeIpc: (key) => {
+    ipcRenderer.removeAllListeners(key);
+  },
 });
