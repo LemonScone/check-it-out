@@ -85,12 +85,11 @@ const formatDateWithColon = (day) => {
   return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
 };
 
-function Toolbar() {
+function Toolbar({ isOnTracked, setIsOnTracked }) {
   let [start, setStart] = useState('');
   let [finish, setFinish] = useState('');
   let [workingTime, setWorkingTime] = useState(0);
-  let [isOnTracked, setIsOnTracked] = useState(false);
-  let [intervalForTimer, setIntervalForTimer] = useState(null);
+  //let [isOnTracked, setIsOnTracked] = useState(false);
   let [selectedDay, setSelectedDay] = useState(new Date());
 
   useEffect(() => {
@@ -103,7 +102,7 @@ function Toolbar() {
 
   useInterval(
     () => {
-      setIntervalForTimer(addTime());
+      setWorkingTime(workingTime + 1);
     },
     isOnTracked ? 1000 : null,
   );
@@ -127,10 +126,6 @@ function Toolbar() {
       action === 'GO_YESTERDAY' ? selectedDay.getDate() - 1 : selectedDay.getDate() + 1,
     );
     setSelectedDay(new Date(selectedDay));
-  }
-
-  function addTime() {
-    setWorkingTime(workingTime + 1);
   }
 
   return (
