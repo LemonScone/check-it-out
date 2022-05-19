@@ -7,6 +7,7 @@ const {
 } = window;
 
 function App() {
+  let [isOnTracked, setIsOnTracked] = useState(false);
   const [activeWindows, setActiveWindows] = useState([]);
 
   useEffect(() => {
@@ -20,14 +21,20 @@ function App() {
     };
   }, [activeWindows]);
 
-  useInterval(() => {
-    sendIpc('ACTIVE_WINDOW', '');
-  }, 5000);
+  useInterval(
+    () => {
+      sendIpc('ACTIVE_WINDOW', '');
+    },
+    isOnTracked ? 5000 : null,
+  );
 
   return (
     <div className="App">
       <header className="App-header"></header>
-      <Toolbar name="check-it-out"></Toolbar>
+      <Toolbar
+        name="check-it-out"
+        isOnTracked={isOnTracked}
+        setIsOnTracked={setIsOnTracked}></Toolbar>
       <ProgramTable programList={activeWindows}></ProgramTable>
     </div>
   );

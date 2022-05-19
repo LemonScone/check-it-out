@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const formatDistanceStrict = require('date-fns/formatDistanceStrict');
+//require('devtron').install();
 
 const activeWindows = [];
 let currentActiveWin;
@@ -9,6 +10,8 @@ let currentActiveWin;
 app.whenReady().then(() => {
   let win = new BrowserWindow({
     show: false,
+    width: 960,
+    height: 540,
     webPreferences: {
       enableRemoteModule: true,
       preload: `${__dirname}/preload.js`,
