@@ -13,7 +13,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
 
-function createData(key, name, title, startDate, finishedDate, distance) {
+function createData(key, name, title, startDate, finishedDate, distance, bundleId) {
   return {
     key,
     name,
@@ -21,6 +21,7 @@ function createData(key, name, title, startDate, finishedDate, distance) {
     startDate,
     finishedDate,
     distance,
+    bundleId,
   };
 }
 function descendingComparator(a, b, orderBy) {
@@ -128,10 +129,9 @@ EnhancedTableHead.propTypes = {
 export default function ProgramTable(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('name');
-  console.log(`props`, props);
 
   const rows = props.programList.reverse().map((program) => {
-    const { name, title, startDate, finishedDate, distance } = program;
+    const { name, title, startDate, finishedDate, distance, bundleId } = program;
     return createData(
       nextId(),
       name,
@@ -139,6 +139,7 @@ export default function ProgramTable(props) {
       format(startDate, 'HH:mm'),
       finishedDate && format(finishedDate, 'HH:mm'),
       distance,
+      bundleId,
     );
   });
 
@@ -170,7 +171,20 @@ export default function ProgramTable(props) {
                     <TableCell component="th" id={labelId} scope="row">
                       {row.name}
                     </TableCell>
-                    <TableCell align="left">{row.title}</TableCell>
+                    <TableCell align="left">
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          verticalAlign: 'top',
+                          marginRight: '5px',
+                        }}>
+                        <img
+                          style={{ width: '20px' }}
+                          src={`../../assets/images/${row.bundleId}.png`}
+                          alt="program-icon"></img>
+                      </div>
+                      {row.title}
+                    </TableCell>
                     <TableCell align="left">{row.startDate}</TableCell>
                     <TableCell align="left">{row.finishedDate}</TableCell>
                     <TableCell align="left">{row.distance}</TableCell>
