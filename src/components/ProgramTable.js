@@ -71,13 +71,13 @@ const headCells = [
     id: 'startDate',
     numeric: false,
     disablePadding: false,
-    label: '시작시간 (HH:mm)',
+    label: '시작시간 (HH:mm:ss)',
   },
   {
     id: 'finishedDate',
     numeric: false,
     disablePadding: false,
-    label: '종료시간 (HH:mm)',
+    label: '종료시간 (HH:mm:ss)',
   },
   {
     id: 'distance',
@@ -136,8 +136,8 @@ export default function ProgramTable(props) {
       nextId(),
       name,
       title,
-      format(startDate, 'HH:mm'),
-      finishedDate && format(finishedDate, 'HH:mm'),
+      format(startDate, 'HH:mm:ss'),
+      finishedDate && format(finishedDate, 'HH:mm:ss'),
       distance,
       bundleId,
     );
