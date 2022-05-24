@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const formatDistanceStrict = require('date-fns/formatDistanceStrict');
+const { storeAppIcon } = require('./utils/icon');
 //require('devtron').install();
 
 const activeWindows = [];
@@ -29,13 +30,22 @@ app.whenReady().then(() => {
     const activeWin = require('active-win');
     let window = await activeWin({ screenRecordingPermission: true });
 
+    const {
+      id,
+      title,
+      url,
+      owner: { name, processId, path },
+    } = window;
+
+    storeAppIcon(name, path); // 앱 아이콘 저장
+
     //* 데이터 가공
     const processedWindow = {
-      id: window.id,
-      title: window.title,
-      processId: window.owner.processId,
-      name: window.owner.name,
-      url: window.url,
+      id,
+      title,
+      processId,
+      name,
+      url: url,
       startDate: new Date(),
     };
 

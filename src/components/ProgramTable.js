@@ -13,7 +13,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
 
-function createData(key, name, title, startDate, finishedDate, distance) {
+function createData(key, name, title, startDate, finishedDate, distance, bundleId) {
   return {
     key,
     name,
@@ -21,6 +21,7 @@ function createData(key, name, title, startDate, finishedDate, distance) {
     startDate,
     finishedDate,
     distance,
+    bundleId,
   };
 }
 function descendingComparator(a, b, orderBy) {
@@ -70,13 +71,13 @@ const headCells = [
     id: 'startDate',
     numeric: false,
     disablePadding: false,
-    label: '시작시간 (HH:mm)',
+    label: '시작시간 (HH:mm:ss)',
   },
   {
     id: 'finishedDate',
     numeric: false,
     disablePadding: false,
-    label: '종료시간 (HH:mm)',
+    label: '종료시간 (HH:mm:ss)',
   },
   {
     id: 'distance',
@@ -128,17 +129,17 @@ EnhancedTableHead.propTypes = {
 export default function ProgramTable(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('name');
-  console.log(`props`, props);
 
   const rows = props.programList.reverse().map((program) => {
-    const { name, title, startDate, finishedDate, distance } = program;
+    const { name, title, startDate, finishedDate, distance, bundleId } = program;
     return createData(
       nextId(),
       name,
       title,
-      format(startDate, 'HH:mm'),
-      finishedDate && format(finishedDate, 'HH:mm'),
+      format(startDate, 'HH:mm:ss'),
+      finishedDate && format(finishedDate, 'HH:mm:ss'),
       distance,
+      bundleId,
     );
   });
 
@@ -165,9 +166,26 @@ export default function ProgramTable(props) {
               {stableSort(rows, getComparator(order, orderBy)).map((row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
+                const iconFileName = row.name.replace(/\s+/g, '-').toLowerCase();
+                const assetPathPrefix = `../../assets/images`;
+                const iconPath = `${assetPathPrefix}/${iconFileName}.png`;
+                const handleIconError = (e) => (e.target.src = `${assetPathPrefix}/no-icon.png`);
+
                 return (
                   <TableRow hover tabIndex={-1} key={row.key}>
                     <TableCell component="th" id={labelId} scope="row">
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          verticalAlign: 'top',
+                          marginRight: '5px',
+                        }}>
+                        <img
+                          style={{ width: '20px' }}
+                          src={iconPath}
+                          alt="application icon"
+                          onError={handleIconError}></img>
+                      </div>
                       {row.name}
                     </TableCell>
                     <TableCell align="left">{row.title}</TableCell>
