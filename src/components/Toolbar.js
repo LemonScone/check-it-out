@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
 import { Button, ButtonGroup, Card, Divider } from '@mui/material';
 import MuiGrid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import { PlayArrow, Pause, ArrowForwardIos } from '@mui/icons-material';
 import { ArrowBackIosNew } from '@mui/icons-material';
 import { useInterval } from '../hooks/intervalHooks.js';
+
+const {
+  electronBridge: { sendIpc, onIpc },
+} = window;
 
 const Grid = styled(MuiGrid)(({ theme }) => ({
   width: '100%',
@@ -92,14 +97,6 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
   //let [isOnTracked, setIsOnTracked] = useState(false);
   let [selectedDay, setSelectedDay] = useState(new Date());
 
-  useEffect(() => {
-    console.log('useEffect');
-
-    return function cleanup() {
-      console.log('cleanup');
-    };
-  });
-
   useInterval(
     () => {
       setWorkingTime(workingTime + 1);
@@ -125,6 +122,8 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
     selectedDay.setDate(
       action === 'GO_YESTERDAY' ? selectedDay.getDate() - 1 : selectedDay.getDate() + 1,
     );
+    //* selectedDay에 맞는 데이터를 electron-store에서 가져오기
+    sendIpc('SELECTEDDAY_WINDOW', format(selectedDay, 'yyyy-MM-dd'));
     setSelectedDay(new Date(selectedDay));
   }
 

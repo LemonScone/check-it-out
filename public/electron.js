@@ -8,6 +8,7 @@ const activeWin = require('active-win');
 const { storeAppIcon } = require('./utils/icon');
 
 const store = new Store();
+let isSelectedDayToday = true;
 
 app.whenReady().then(() => {
   let win = new BrowserWindow({
@@ -26,6 +27,18 @@ app.whenReady().then(() => {
     // win.loadURL(`file://${path.join(__dirname, '../build/index.html')}`)
     win.loadFile(`${path.join(__dirname, '../build/index.html')}`);
   }
+
+  ipcMain.on('SELECTEDDAY_WINDOW', (event, payload) => {
+    //TODO 1. 오늘 목록만 저장할 변수? 관리하기 / 오늘 목록인지 확인할 변수도 필요함
+    //TODO 2. 이전/다음 날짜로 넘어갔을 때 선택한 날짜가 오늘이 아니면 리스트는 더 이상 업데이트 하지 않아야 함
+    //TODO 2-1. 추적중인 경우(start 버튼이 클릭된 경우)에 현재 추척 목록은 저장하되 리스트는 더 이상 업데이트 하지 않아야 하고
+    //TODO 2-2. 오늘 목록으로 넘어오면 따로 저장해둔 목록을 불러와야 함
+
+    isSelectedDayToday = payload === format(new Date(), 'yyyy-MM-dd');
+
+    const activeWindows = findTrackWindowByDate(payload);
+    event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
+  });
 
   ipcMain.on('ACTIVE_WINDOW', async (event, payload) => {
     let window = await activeWin({ screenRecordingPermission: true });
@@ -76,7 +89,9 @@ app.whenReady().then(() => {
 
     const activeWindows = findTrackWindowByDate(new Date());
 
-    event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
+    if (isSelectedDayToday) {
+      event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
+    }
   });
 
   win.once('ready-to-show', () => win.show());
@@ -95,7 +110,8 @@ app.on('window-all-closed', () => {
 });
 
 const findTrackWindowByDate = (comparedDate) => {
-  comparedDate = typeof date === 'string' ? new Date(comparedDate) : comparedDate;
+  comparedDate = typeof comparedDate === 'string' ? new Date(comparedDate) : comparedDate;
+
   const filtered = store
     .get('trackWindows')
     .filter(
