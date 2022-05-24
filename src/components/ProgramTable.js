@@ -166,12 +166,14 @@ export default function ProgramTable(props) {
               {stableSort(rows, getComparator(order, orderBy)).map((row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
+                const iconFileName = row.name.replace(/\s+/g, '-').toLowerCase();
+                const assetPathPrefix = `../../assets/images`;
+                const iconPath = `${assetPathPrefix}/${iconFileName}.png`;
+                const handleIconError = (e) => (e.target.src = `${assetPathPrefix}/no-icon.png`);
+
                 return (
                   <TableRow hover tabIndex={-1} key={row.key}>
                     <TableCell component="th" id={labelId} scope="row">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="left">
                       <div
                         style={{
                           display: 'inline-flex',
@@ -180,11 +182,13 @@ export default function ProgramTable(props) {
                         }}>
                         <img
                           style={{ width: '20px' }}
-                          src={`../../assets/images/${row.bundleId}.png`}
-                          alt="program-icon"></img>
+                          src={iconPath}
+                          alt="application icon"
+                          onError={handleIconError}></img>
                       </div>
-                      {row.title}
+                      {row.name}
                     </TableCell>
+                    <TableCell align="left">{row.title}</TableCell>
                     <TableCell align="left">{row.startDate}</TableCell>
                     <TableCell align="left">{row.finishedDate}</TableCell>
                     <TableCell align="left">{row.distance}</TableCell>

@@ -8,7 +8,9 @@ const getAppIconBuffer = (filePath) => {
 };
 
 const storeAppIcon = (appName, filePath) => {
-  const pathToAsset = path.join(__dirname, `../assets/images/${appName}.png`);
+  const fileName = appName.replace(/\s+/g, '-').toLowerCase();
+  const pathToAsset = path.join(__dirname, `../assets/images/${fileName}.png`);
+
   if (fs.existsSync(pathToAsset)) {
     return;
   }

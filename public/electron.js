@@ -30,18 +30,23 @@ app.whenReady().then(() => {
     const activeWin = require('active-win');
     let window = await activeWin({ screenRecordingPermission: true });
 
-    const bundleId = window.owner.bundleId.replace(/\./g, '-');
-    storeAppIcon(bundleId, window.owner.path); // 앱 아이콘 저장
+    const {
+      id,
+      title,
+      url,
+      owner: { name, processId, path },
+    } = window;
+
+    storeAppIcon(name, path); // 앱 아이콘 저장
 
     //* 데이터 가공
     const processedWindow = {
-      id: window.id,
-      title: window.title,
-      processId: window.owner.processId,
-      name: window.owner.name,
-      url: window.url,
+      id,
+      title,
+      processId,
+      name,
+      url: url,
       startDate: new Date(),
-      bundleId,
     };
 
     //* 첫 할당이거나 활성 프로그램이 변했으면 재할당
