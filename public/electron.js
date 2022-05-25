@@ -26,8 +26,8 @@ app.whenReady().then(() => {
   ipcMain.on('SELECTEDDAY_WINDOW', (event, payload) => {
     trackWindowStore.setSelectedDay(payload);
 
-    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
-    event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
+    const allDayTrackWindows = trackWindowStore.findTrackWindowBySelectedDay();
+    event.reply('REPLY_ACTIVE_WINDOW', { allDayTrackWindows });
   });
 
   ipcMain.on('ACTIVE_WINDOW', async (event) => {
@@ -39,7 +39,7 @@ app.whenReady().then(() => {
       owner: { name, processId, path },
     } = window;
 
-    const processedWindow = {
+    const newActiveWin = {
       id,
       title,
       processId,
@@ -52,29 +52,29 @@ app.whenReady().then(() => {
 
     trackWindowStore.getStore();
 
-    if (trackWindowStore.isNewTrackWindow(processedWindow)) {
+    if (trackWindowStore.isNewTrackWindow(newActiveWin)) {
       if (trackWindowStore.hasCurrentWindow()) {
-        trackWindowStore.setCurrentActiveWinFinishedDate(processedWindow.startDate);
+        trackWindowStore.setCurrentActiveWinFinishedDate(newActiveWin.startDate);
       }
-      trackWindowStore.setNewTrackWindow(processedWindow);
+      trackWindowStore.setNewTrackWindow(newActiveWin);
     }
 
     if (trackWindowStore.isSelectedDayToday()) {
-      const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
-      event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
+      const allDayTrackWindows = trackWindowStore.findTrackWindowBySelectedDay();
+      event.reply('REPLY_ACTIVE_WINDOW', { newActiveWin, allDayTrackWindows });
     }
   });
 
   ipcMain.on('STOP_ACTIVE_WINDOW', async (event) => {
     trackWindowStore.endTrackingWindow();
 
-    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
-    event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
+    const allDayTrackWindows = trackWindowStore.findTrackWindowBySelectedDay();
+    event.reply('REPLY_ACTIVE_WINDOW', { allDayTrackWindows });
   });
 
   win.webContents.on('did-finish-load', () => {
-    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
-    win.webContents.send('REPLY_ACTIVE_WINDOW', { activeWindows });
+    const allDayTrackWindows = trackWindowStore.findTrackWindowBySelectedDay();
+    win.webContents.send('REPLY_ACTIVE_WINDOW', { allDayTrackWindows });
   });
 
   win.once('ready-to-show', () => win.show());

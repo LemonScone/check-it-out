@@ -8,18 +8,18 @@ const {
 
 function App() {
   let [isOnTracked, setIsOnTracked] = useState(false);
-  const [activeWindows, setActiveWindows] = useState([]);
+  const [allDayTrackWindows, setAllDayTrackWindows] = useState([]);
 
   useEffect(() => {
     onIpc('REPLY_ACTIVE_WINDOW', (event, payload) => {
-      console.log(payload.processedWindow);
-      console.table(payload.activeWindows);
-      setActiveWindows(payload.activeWindows);
+      console.log(payload.newActiveWin);
+      console.table(payload.allDayTrackWindows);
+      setAllDayTrackWindows(payload.allDayTrackWindows);
     });
     return () => {
       removeIpc('REPLY_ACTIVE_WINDOW');
     };
-  }, [activeWindows]);
+  }, [allDayTrackWindows]);
 
   useInterval(
     () => {
@@ -35,7 +35,7 @@ function App() {
         name="check-it-out"
         isOnTracked={isOnTracked}
         setIsOnTracked={setIsOnTracked}></Toolbar>
-      <ProgramTable programList={activeWindows}></ProgramTable>
+      <ProgramTable programList={allDayTrackWindows}></ProgramTable>
     </div>
   );
 }
