@@ -108,6 +108,10 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
     setStart(isOnTracked ? start : new Date().toLocaleString());
     setFinish(isOnTracked ? new Date().toLocaleString() : '작업중');
     setIsOnTracked(!isOnTracked);
+
+    if (isOnTracked) {
+      sendIpc('STOP_ACTIVE_WINDOW');
+    }
   }
 
   function handleLeftArrowButtonClick() {

@@ -100,6 +100,14 @@ class TrackWindowStore {
       }
     });
   };
+
+  endTrackingWindow = () => {
+    if (this.hasCurrentWindow()) {
+      this.setCurrentActiveWinFinishedDate(new Date());
+      this.setStore();
+    }
+    this.deleteCurrentActiveWin();
+  };
 }
 
 module.exports.trackWindowStore = new TrackWindowStore();

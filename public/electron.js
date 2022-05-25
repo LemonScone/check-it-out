@@ -65,6 +65,13 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('STOP_ACTIVE_WINDOW', async (event) => {
+    trackWindowStore.endTrackingWindow();
+
+    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
+    event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
+  });
+
   win.once('ready-to-show', () => win.show());
   win.on('closed', () => {
     win = null;
@@ -78,4 +85,8 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   app.quit();
+});
+
+app.on('quit', () => {
+  trackWindowStore.endTrackingWindow();
 });
