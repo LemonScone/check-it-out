@@ -72,6 +72,11 @@ app.whenReady().then(() => {
     event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
   });
 
+  win.webContents.on('did-finish-load', () => {
+    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
+    win.webContents.send('REPLY_ACTIVE_WINDOW', { activeWindows });
+  });
+
   win.once('ready-to-show', () => win.show());
   win.on('closed', () => {
     win = null;
