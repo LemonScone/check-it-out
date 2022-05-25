@@ -1,14 +1,9 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
-const { format, intervalToDuration, formatDuration } = require('date-fns');
-const formatDistanceStrict = require('date-fns/formatDistanceStrict');
-const Store = require('electron-store');
 const activeWin = require('active-win');
 const { storeAppIcon } = require('./utils/icon');
-
-const store = new Store();
-let isSelectedDayToday = true;
+const { trackWindowStore } = require('./store/TrackWindowStore.js');
 
 app.whenReady().then(() => {
   let win = new BrowserWindow({
@@ -29,17 +24,13 @@ app.whenReady().then(() => {
   }
 
   ipcMain.on('SELECTEDDAY_WINDOW', (event, payload) => {
-    isSelectedDayToday = payload === format(new Date(), 'yyyy-MM-dd');
+    trackWindowStore.setSelectedDay(payload);
 
-    const activeWindows = findTrackWindowByDate(payload);
+    const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
     event.reply('REPLY_ACTIVE_WINDOW', { activeWindows });
   });
 
   ipcMain.on('ACTIVE_WINDOW', async (event) => {
-    //* store에는 "trackWindows"와 "currentActiveWin"이 저장되어 있음
-    const trackWindows = store.get('trackWindows') || [];
-    const currentActiveWin = store.get('currentActiveWin') || null;
-
     const window = await activeWin({ screenRecordingPermission: true });
     const {
       id,
@@ -48,9 +39,6 @@ app.whenReady().then(() => {
       owner: { name, processId, path },
     } = window;
 
-    storeAppIcon(name, path); // 앱 아이콘 저장
-
-    //* 데이터 가공
     const processedWindow = {
       id,
       title,
@@ -60,28 +48,19 @@ app.whenReady().then(() => {
       startDate: new Date(),
     };
 
-    //* 첫 할당이거나 활성 프로그램이 변했으면 재할당
-    if (!currentActiveWin || !isSameWindow(currentActiveWin, processedWindow)) {
-      if (currentActiveWin) {
-        const { startDate } = currentActiveWin;
-        const { startDate: finishedDate } = processedWindow;
-        const distance = getDistanceDate(startDate, finishedDate);
+    storeAppIcon(name, path); // 앱 아이콘 저장
 
-        //* 활성 프로그램이 바꼈으면 이전의 active-win 객체에 finishedDate와 distance 정보 업데이트
-        trackWindows.forEach((w) => {
-          if (isSameWindow(w, currentActiveWin) && w.startDate === currentActiveWin.startDate) {
-            [w.finishedDate, w.distance] = [finishedDate, distance];
-          }
-        });
+    trackWindowStore.getStore();
+
+    if (trackWindowStore.isNewTrackWindow(processedWindow)) {
+      if (trackWindowStore.hasCurrentWindow()) {
+        trackWindowStore.setCurrentActiveWinFinishedDate(processedWindow.startDate);
       }
-      trackWindows.push(processedWindow);
-      store.set('trackWindows', trackWindows);
-      store.set('currentActiveWin', processedWindow);
+      trackWindowStore.setNewTrackWindow(processedWindow);
     }
 
-    const activeWindows = findTrackWindowByDate(new Date());
-
-    if (isSelectedDayToday) {
+    if (trackWindowStore.isSelectedDayToday()) {
+      const activeWindows = trackWindowStore.findTrackWindowBySelectedDay();
       event.reply('REPLY_ACTIVE_WINDOW', { processedWindow, activeWindows });
     }
   });
@@ -100,56 +79,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   app.quit();
 });
-
-const isSameWindow = (item1, item2) => {
-  if (item1 && item2 && item1.app === item2.app && item1.title === item2.title) {
-    return true;
-  }
-
-  return false;
-};
-
-const findTrackWindowByDate = (comparedDate) => {
-  comparedDate = typeof comparedDate === 'string' ? new Date(comparedDate) : comparedDate;
-
-  const filtered = store
-    .get('trackWindows')
-    .filter(
-      (w) => format(new Date(w.startDate), 'yyyy-MM-dd') === format(comparedDate, 'yyyy-MM-dd'),
-    );
-
-  filtered.forEach(
-    (w) =>
-      ([w.startDate, w.finishedDate] = [
-        new Date(w.startDate),
-        w.finishedDate ? new Date(w.finishedDate) : null,
-      ]),
-  );
-
-  return filtered;
-};
-
-const getDistanceDate = (baseDate, comparedDate) => {
-  const formatDistanceLocale = {
-    xSeconds: (count) => `${count}sec`,
-    xMinutes: (count) => `${count}min`,
-    xHours: (count) => `${count}hour`,
-  };
-
-  const shortLocale = {
-    formatDistance: (token, count) => formatDistanceLocale[token](count),
-  };
-
-  const seconds = parseInt(
-    formatDistanceStrict(new Date(baseDate), new Date(comparedDate), {
-      unit: 'second',
-    }),
-  );
-  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-  const distance = formatDuration(duration, {
-    format: ['hours', 'minutes', 'seconds'],
-    locale: shortLocale,
-  });
-
-  return distance;
-};
