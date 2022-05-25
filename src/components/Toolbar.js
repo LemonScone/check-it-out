@@ -8,7 +8,7 @@ import { ArrowBackIosNew } from '@mui/icons-material';
 import { useInterval } from '../hooks/intervalHooks.js';
 
 const {
-  electronBridge: { sendIpc, onIpc },
+  electronBridge: { sendIpc },
 } = window;
 
 const Grid = styled(MuiGrid)(({ theme }) => ({
@@ -36,6 +36,15 @@ const SelectDayButton = (props) => {
         <ArrowForwardIos sx={{ fontSize: 15 }} />
       </Button>
     </ButtonGroup>
+  );
+};
+
+const TodayButton = (props) => {
+  const { handleTodayButtonClick } = props;
+  return (
+    <Button variant="contained" onClick={handleTodayButtonClick} color={'success'}>
+      TODAY
+    </Button>
   );
 };
 
@@ -122,6 +131,16 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
     selectDayByClicked('GO_TOMORROW');
   }
 
+  function handleTodayButtonClick() {
+    const selectedDayFormat = format(new Date(selectedDay), 'yyyy-MM-dd');
+    const todayFormat = format(new Date(), 'yyyy-MM-dd');
+
+    if (selectedDayFormat !== todayFormat) {
+      sendIpc('SELECTEDDAY_WINDOW', todayFormat);
+      setSelectedDay(new Date());
+    }
+  }
+
   function selectDayByClicked(action) {
     selectedDay.setDate(
       action === 'GO_YESTERDAY' ? selectedDay.getDate() - 1 : selectedDay.getDate() + 1,
@@ -139,6 +158,7 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
             selectedDay={selectedDay}
             handleLeftArrowButtonClick={handleLeftArrowButtonClick}
             handleRightArrowButtonClick={handleRightArrowButtonClick}></SelectDayButton>
+          <TodayButton handleTodayButtonClick={handleTodayButtonClick}></TodayButton>
         </Grid>
         <Grid item xs={6} sx={{ p: 0, display: 'flex', justifyContent: 'flex-end' }}>
           <Timer handleTrackButtonClick={handleTrackButtonClick} isOnTracked={isOnTracked} />
