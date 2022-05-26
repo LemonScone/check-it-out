@@ -127,8 +127,8 @@ EnhancedTableHead.propTypes = {
 };
 
 export default function ProgramTable(props) {
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('name');
+  const [order, setOrder] = React.useState('desc');
+  const [orderBy, setOrderBy] = React.useState('startDate');
 
   const rows = props.programList.reverse().map((program) => {
     const { name, title, startDate, finishedDate, distance, bundleId } = program;
