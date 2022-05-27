@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
 import { Button, ButtonGroup, Card, Divider } from '@mui/material';
 import MuiGrid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import { PlayArrow, Pause, ArrowForwardIos } from '@mui/icons-material';
 import { ArrowBackIosNew } from '@mui/icons-material';
 import { useInterval } from '../hooks/intervalHooks.js';
+
+const {
+  electronBridge: { sendIpc },
+} = window;
 
 const Grid = styled(MuiGrid)(({ theme }) => ({
   width: '100%',
@@ -31,6 +36,15 @@ const SelectDayButton = (props) => {
         <ArrowForwardIos sx={{ fontSize: 15 }} />
       </Button>
     </ButtonGroup>
+  );
+};
+
+const TodayButton = (props) => {
+  const { handleTodayButtonClick } = props;
+  return (
+    <Button variant="contained" onClick={handleTodayButtonClick} color={'success'} sx={{ ml: 1 }}>
+      TODAY
+    </Button>
   );
 };
 
@@ -92,14 +106,6 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
   //let [isOnTracked, setIsOnTracked] = useState(false);
   let [selectedDay, setSelectedDay] = useState(new Date());
 
-  useEffect(() => {
-    console.log('useEffect');
-
-    return function cleanup() {
-      console.log('cleanup');
-    };
-  });
-
   useInterval(
     () => {
       setWorkingTime(workingTime + 1);
@@ -111,6 +117,10 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
     setStart(isOnTracked ? start : new Date().toLocaleString());
     setFinish(isOnTracked ? new Date().toLocaleString() : '작업중');
     setIsOnTracked(!isOnTracked);
+
+    if (isOnTracked) {
+      sendIpc('STOP_ACTIVE_WINDOW');
+    }
   }
 
   function handleLeftArrowButtonClick() {
@@ -121,10 +131,22 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
     selectDayByClicked('GO_TOMORROW');
   }
 
+  function handleTodayButtonClick() {
+    const selectedDayFormat = format(new Date(selectedDay), 'yyyy-MM-dd');
+    const todayFormat = format(new Date(), 'yyyy-MM-dd');
+
+    if (selectedDayFormat !== todayFormat) {
+      sendIpc('SELECTEDDAY_WINDOW', todayFormat);
+      setSelectedDay(new Date());
+    }
+  }
+
   function selectDayByClicked(action) {
     selectedDay.setDate(
       action === 'GO_YESTERDAY' ? selectedDay.getDate() - 1 : selectedDay.getDate() + 1,
     );
+    //* selectedDay에 맞는 데이터를 electron-store에서 가져오기
+    sendIpc('SELECTEDDAY_WINDOW', format(selectedDay, 'yyyy-MM-dd'));
     setSelectedDay(new Date(selectedDay));
   }
 
@@ -136,6 +158,7 @@ function Toolbar({ isOnTracked, setIsOnTracked }) {
             selectedDay={selectedDay}
             handleLeftArrowButtonClick={handleLeftArrowButtonClick}
             handleRightArrowButtonClick={handleRightArrowButtonClick}></SelectDayButton>
+          <TodayButton handleTodayButtonClick={handleTodayButtonClick}></TodayButton>
         </Grid>
         <Grid item xs={6} sx={{ p: 0, display: 'flex', justifyContent: 'flex-end' }}>
           <Timer handleTrackButtonClick={handleTrackButtonClick} isOnTracked={isOnTracked} />
