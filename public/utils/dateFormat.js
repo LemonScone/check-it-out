@@ -3,9 +3,9 @@ const formatDistanceStrict = require('date-fns/formatDistanceStrict');
 
 module.exports.getDistanceDate = (startDate, finishedDate) => {
   const formatDistanceLocale = {
-    xSeconds: (count) => `${count}sec`,
-    xMinutes: (count) => `${count}min`,
-    xHours: (count) => `${count}hour`,
+    xSeconds: (count) => `${count}s`,
+    xMinutes: (count) => `${count}m`,
+    xHours: (count) => `${count}h`,
   };
 
   const shortLocale = {

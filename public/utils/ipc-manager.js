@@ -30,8 +30,6 @@ const activeWinActions = {
 
     storeAppIcon(name, path); // 앱 아이콘 저장
 
-    trackWindowStore.getStore();
-
     if (trackWindowStore.isNewTrackWindow(newActiveWin)) {
       if (trackWindowStore.hasCurrentWindow()) {
         trackWindowStore.setCurrentActiveWinFinishedDate(newActiveWin.startDate);

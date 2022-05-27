@@ -53,7 +53,6 @@ class TrackWindowStore {
   setNewTrackWindow = (newWindow) => {
     this.addTrackWindows(newWindow);
     this.setCurrentActiveWin(newWindow);
-    this.setStore();
   };
 
   hasCurrentWindow = () => {

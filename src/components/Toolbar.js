@@ -42,7 +42,7 @@ const SelectDayButton = (props) => {
 const TodayButton = (props) => {
   const { handleTodayButtonClick } = props;
   return (
-    <Button variant="contained" onClick={handleTodayButtonClick} color={'success'}>
+    <Button variant="contained" onClick={handleTodayButtonClick} color={'success'} sx={{ ml: 1 }}>
       TODAY
     </Button>
   );
