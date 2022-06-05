@@ -167,7 +167,7 @@ export default function ProgramTable(props) {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 const iconFileName = row.name.replace(/\s+/g, '-').toLowerCase();
-                const assetPathPrefix = `../../assets/images`;
+                const assetPathPrefix = `${process.env.PUBLIC_URL}/assets/images`;
                 const iconPath = `${assetPathPrefix}/${iconFileName}.png`;
                 const handleIconError = (e) => (e.target.src = `${assetPathPrefix}/no-icon.png`);
 
