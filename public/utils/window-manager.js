@@ -20,8 +20,7 @@ class WindowManager {
       this.window.loadURL('http://localhost:3000');
       this.window.webContents.openDevTools();
     } else {
-      // this.mainWindowloadURL(`file://${path.join(__dirname, '../build/index.html')}`)
-      this.window.loadFile(`${path.join(__dirname, '../build/index.html')}`);
+      this.window.loadURL(`file://${path.join(__dirname, '../index.html')}`);
     }
 
     this.window.once('ready-to-show', () => this.window.show());
