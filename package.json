@@ -2,7 +2,17 @@
   "name": "check-it-out",
   "version": "0.1.0",
   "main": "public/electron.js",
-  "private": true,
+  "homepage": "./",
+  "build": {
+    "appId": "com.checkitout.app",
+    "productName": "Check It Out",
+    "mac": {
+      "icon": "public/assets/icons/mac/icon.png"
+    },
+    "win": {
+      "icon": "public/assets/icons/win/icon.png"
+    }
+  },
   "dependencies": {
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
@@ -19,13 +29,23 @@
     "react-id-generator": "^3.0.2",
     "react-scripts": "^4.0.3"
   },
+  "devDependencies": {
+    "concurrently": "^6.2.1",
+    "electron": "^14.0.0",
+    "electron-builder": "^23.0.3",
+    "electron-devtools-installer": "^3.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2",
+    "wait-on": "^6.0.0"
+  },
   "scripts": {
     "start": "concurrently \"BROWSER=none npm run react:start\" \"npm run electron:start\"",
     "react:start": "react-scripts start",
     "electron:start": "wait-on http://localhost:3000 && mode=dev electron .",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "react:build": "react-scripts build",
+    "electron:build": "electron-builder -mw",
+    "build": "yarn react:build && yarn electron:build"
   },
   "browserslist": {
     "production": [
@@ -38,14 +58,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "concurrently": "^6.2.1",
-    "electron": "^14.0.0",
-    "electron-devtools-installer": "^3.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.3.2",
-    "wait-on": "^6.0.0"
   }
 }
